@@ -30,6 +30,7 @@ local plugins = {
 	{ "williamboman/mason.nvim" },
 	{ "williamboman/mason-lspconfig.nvim" },
 	{ "neovim/nvim-lspconfig" },
+	{ "hrsh7th/vim-vsnip" },
 	{ "hrsh7th/nvim-cmp",
 		dependencies = {
 			{
@@ -81,9 +82,11 @@ require('lspconfig').rust_analyzer.setup {
 }
 
 require("mason-lspconfig").setup {
-    ensure_installed = { "rust_analyzer" },
+    ensure_installed = {
+		"rust_analyzer",
+		"clangd"
+	},
 }
-require("lspconfig").rust_analyzer.setup {}
 
 local null_ls = require("null-ls")
 
@@ -115,7 +118,8 @@ cmp.setup({
         }),
     },
     sources = {
-        { name = 'nvim_lsp' },
+		{ name = "nvim_lsp", entry_filter = function(entry, ctx) 
+		return require("cmp").lsp.CompletionItemKind.Text ~= entry:get_kind() end },
         { name = 'vsnip' },
     },
 })
@@ -127,8 +131,29 @@ lspconfig.clangd.setup({
     root_dir = lspconfig.util.root_pattern("compile_commands.json", "compile_flags.txt", ".git"),
 })
 
+lspconfig.rust_analyzer.setup({})
+
+require("lspconfig").lua_ls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  settings = {
+    Lua = {
+      format = {
+        enable = true,
+        -- Put format options here
+        -- NOTE: the value should be STRING!!
+        defaultConfig = {
+          indent_style = "space",
+          indent_size = "2",
+        },
+      },
+    },
+  },
+}
+
 local util = require "lspconfig/util"
 
 
 -- Optionally, you can define additional key mappings for triggering completion manually
 vim.api.nvim_set_keymap('i', '<C-Space>', 'v:lua.require("cmp").complete()', { expr = true, noremap = true })
+
