@@ -75,6 +75,7 @@ require'cmp'.setup {
   }
 }
 
+
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 require('lspconfig').rust_analyzer.setup {
   capabilities = capabilities,
@@ -116,6 +117,10 @@ cmp.setup({
             behavior = cmp.ConfirmBehavior.Replace,
             select = true,
         }),
+		['<Left>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
+		['<Right>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
+
+
     },
     sources = {
 		{ name = "nvim_lsp", entry_filter = function(entry, ctx) 
