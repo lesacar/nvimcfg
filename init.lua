@@ -1,4 +1,5 @@
 vim.cmd([[
+set clipboard=unnamedplus
 set tabstop=4
 set shiftwidth=4
 set smarttab
@@ -77,10 +78,6 @@ require'cmp'.setup {
 
 
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
-require('lspconfig').rust_analyzer.setup {
-  capabilities = capabilities,
-  ...  -- other lspconfig configs
-}
 
 require("mason-lspconfig").setup {
     ensure_installed = {
@@ -132,15 +129,22 @@ cmp.setup({
 -- Configure and setup C/C++ language server
 lspconfig.clangd.setup({
     cmd = { "clangd", "--background-index" },
+	capabilities = capabilities,
     filetypes = { "c", "cpp" },
     root_dir = lspconfig.util.root_pattern("compile_commands.json", "compile_flags.txt", ".git"),
 })
 
-lspconfig.rust_analyzer.setup({})
+lspconfig.glslls.setup({
+	filetypes = { "fs", "vs", "frag", "vert", "glsl"},
+})
+
+
+
+lspconfig.rust_analyzer.setup({
+})
 
 require("lspconfig").lua_ls.setup {
   capabilities = capabilities,
-  on_attach = on_attach,
   settings = {
     Lua = {
       format = {
@@ -156,9 +160,11 @@ require("lspconfig").lua_ls.setup {
   },
 }
 
-local util = require "lspconfig/util"
+
+-- local util = require "lspconfig/util"
 
 
 -- Optionally, you can define additional key mappings for triggering completion manually
 vim.api.nvim_set_keymap('i', '<C-Space>', 'v:lua.require("cmp").complete()', { expr = true, noremap = true })
-
+vim.api.nvim_set_keymap('n', '<leader>fd', ':lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.hover()<CR>', { expr = true, noremap = true })
