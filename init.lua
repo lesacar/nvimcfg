@@ -1,6 +1,8 @@
 vim.cmd([[
+nnoremap d "_d
 set clipboard=unnamedplus
 set tabstop=4
+set relativenumber
 set shiftwidth=4
 set smarttab
 set softtabstop=4
@@ -37,11 +39,6 @@ local plugins = {
 			{
 				"Saecki/crates.nvim",
 				event = { "BufRead Cargo.toml" },
-				opts = {
-					src = {
-						cmp = { enabled = true },
-					},
-				},
 			},
 		},
 		---@param opts cmp.ConfigSchema
@@ -128,10 +125,17 @@ cmp.setup({
 
 -- Configure and setup C/C++ language server
 lspconfig.clangd.setup({
-    cmd = { "clangd", "--background-index" },
+    cmd = { "clangd", "--background-index"},
 	capabilities = capabilities,
     filetypes = { "c", "cpp" },
-    root_dir = lspconfig.util.root_pattern("compile_commands.json", "compile_flags.txt", ".git"),
+	root_dir = lspconfig.util.root_pattern("compile_commands.json", "compile_flags.txt", ".git"),
+	settings = {
+		clangd = {
+			completion = {
+				includeMacros = true
+			}
+		}
+	}
 })
 
 lspconfig.glslls.setup({
